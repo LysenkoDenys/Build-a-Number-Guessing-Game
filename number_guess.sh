@@ -39,14 +39,14 @@ read USERNAME
 				else
 # increment guess counter if input is valid:
 					((GUESSES++))
-					if (( USER_INPUT > SECRET_NUMBER )); then
-							echo "It's higher than that, guess again:"
-					elif (( USER_INPUT < SECRET_NUMBER )); then
-							echo "It's lower than that, guess again:"
+					if [[ $USER_INPUT -gt $SECRET_NUMBER ]]; then
+						echo "It's higher than that, guess again:"
+					elif [[ $USER_INPUT -lt $SECRET_NUMBER ]]; then
+						echo "It's lower than that, guess again:"
 					else
-							echo "You guessed it in $GUESSES tries. The secret number was $SECRET_NUMBER. Nice job!"
-							$PSQL "INSERT INTO games (user_id, guesses) VALUES($USER_ID, $GUESSES);" > /dev/null
-							exit
+						echo "You guessed it in $GUESSES tries. The secret number was $SECRET_NUMBER. Nice job!"
+						$PSQL "INSERT INTO games (user_id, guesses) VALUES($USER_ID, $GUESSES);" > /dev/null
+						exit
 					fi
 				fi
 		done
