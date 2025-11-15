@@ -22,6 +22,9 @@ read USERNAME
 		else
     GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games WHERE user_id=$USER_ID" | xargs)
     BEST_GAME=$($PSQL "SELECT MIN(guesses) FROM games WHERE user_id=$USER_ID" | xargs)
+			if [[ -z $BEST_GAME ]]; then
+  			BEST_GAME=0
+			fi
     echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 		fi
 		while true
@@ -34,21 +37,16 @@ read USERNAME
 					echo "That is not an integer, guess again:"
 					continue
 				else
-# increment guess counter:
-				 ((GUESSES++))  
-					if [[ $USER_INPUT -gt $SECRET_NUMBER ]]
-					then
-						echo "It's higher than that, guess again:"
-					fi
-					if [[ $USER_INPUT -lt $SECRET_NUMBER ]]
-					then
-						echo "It's lower than that, guess again:"
-					fi
-					if [[ $USER_INPUT -eq $SECRET_NUMBER ]]
-					then
-						echo "You guessed it in $GUESSES tries. The secret number was $SECRET_NUMBER. Nice job!"
-						$PSQL "INSERT INTO games (user_id, guesses) VALUES($USER_ID, $GUESSES)"  > /dev/null
-						exit
+# increment guess counter if input is valid:
+					((GUESSES++))
+					if (( USER_INPUT > SECRET_NUMBER )); then
+							echo "It's higher than that, guess again:"
+					elif (( USER_INPUT < SECRET_NUMBER )); then
+							echo "It's lower than that, guess again:"
+					else
+							echo "You guessed it in $GUESSES tries. The secret number was $SECRET_NUMBER. Nice job!"
+							$PSQL "INSERT INTO games (user_id, guesses) VALUES($USER_ID, $GUESSES);" > /dev/null
+							exit
 					fi
 				fi
 		done
