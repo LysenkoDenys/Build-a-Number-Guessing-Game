@@ -48,8 +48,9 @@ psql --username=freecodecamp --dbname=postgres -f number_guess.sql
 Make the script executable:
 
 chmod +x number_guess.sh
+```
 
-🧰 Usage
+##  🧰 Usage
 
 Run the game:
 
