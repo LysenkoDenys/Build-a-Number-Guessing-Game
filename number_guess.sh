@@ -18,19 +18,22 @@ read USERNAME
 		  # new user
 			$PSQL "INSERT INTO users (username) VALUES('$USERNAME')"  > /dev/null
 			USER_ID=$($PSQL "SELECT user_id FROM users WHERE username='$USERNAME';" | xargs)
-	    echo "Welcome, $USERNAME! It looks like this is your first time here."
+			DB_USERNAME=$USERNAME
+	    echo "Welcome, $DB_USERNAME! It looks like this is your first time here."
 		else
-    GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games WHERE user_id=$USER_ID" | xargs)
-    BEST_GAME=$($PSQL "SELECT MIN(guesses) FROM games WHERE user_id=$USER_ID" | xargs)
-			if [[ -z $BEST_GAME ]]; then
-  			BEST_GAME=0
-			fi
-    echo "Welcome back, $USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
+			DB_USERNAME=$($PSQL "SELECT username FROM users WHERE user_id=$USER_ID;" | xargs)
+			GAMES_PLAYED=$($PSQL "SELECT COUNT(*) FROM games WHERE user_id=$USER_ID" | xargs)
+			BEST_GAME=$($PSQL "SELECT MIN(guesses) FROM games WHERE user_id=$USER_ID" | xargs)
+			# if [[ -z $BEST_GAME ]]; then
+  		# 	BEST_GAME=0
+			# fi
+    echo "Welcome back, $DB_USERNAME! You have played $GAMES_PLAYED games, and your best game took $BEST_GAME guesses."
 		fi
 		while true
 		do
 			echo "Guess the secret number between 1 and 1000:"
 			read USER_INPUT
+			((GUESSES++))
 # check for the valid number:
 				if ! [[ $USER_INPUT =~ ^[0-9]+$ ]];
 				then
@@ -38,7 +41,6 @@ read USERNAME
 					continue
 				else
 # increment guess counter if input is valid:
-						((GUESSES++))
 						if (( USER_INPUT > SECRET_NUMBER )); then
 								echo "It's lower than that, guess again:"
 						elif (( USER_INPUT < SECRET_NUMBER )); then
